@@ -4,6 +4,9 @@ abstract class Lang {
 	const NONE = -1;
 	const CPP  = 0;
 	const PAS  = 1;
+	const CSHARP = 2;
+	const JAVASCRIPT = 3;
+	const PHP  = 4;
 };
 
 abstract class State {
@@ -33,6 +36,40 @@ function Code_IsKeyword($lang, $word) {
 		else if (Lang::PAS == $lang) {
 			$keywords[$lang] .=
 			'absolute|abstract|and|array|as|asm|assembler|at|automated|begin|Boolean|case|class|const|constructor|contains|default|delayed|deprecated|destructor|dispid|dispinterface|div|do|downto|dynamic|else|end|except|experimental|exports|external|false|far|file|final|finalization|finally|for|forward|function|goto|helper|if|implements|in|index|inherited|initialization|inline|Integer|interface|is|label|library|local|message|mod|name|near|nil|nodefault|not|object|of|on|operator|or|out|overload|override|package|packed|pascal|platform|private|procedure|program|property|protected|published|public|raise|read|readonly|record|reference|register|reintroduce|requires|resident|resourcestring|safecall|sealed|set|shl|shr|static|stdcall|stored|strict|string|then|threadvar|to|true|try|type|unit|until|uses|var|varargs|virtual|while|winapi|with|write|writeonly|xor';
+		}
+		else if (Lang::CSHARP == $lang) {
+			// https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
+			// reserved + async await dynamic nameof var where yield
+			$keywords[$lang] .=
+			'abstract|as|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default'
+			.'|delegate|do|double|dynamic|else|enum|event|explicit|extern|false|finally|fixed|float|for|foreach|goto|if'
+			.'|implicit|in|int|interface|internal|is|lock|long|nameof|namespace|new|null|object|operator|out|override|params'
+			.'|private|protected|public|readonly|ref|return|sbyte|sealed|short|sizeof|stackalloc|static|string|struct|switch'
+			.'|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|where|while|yield'
+			;
+		}
+		else if (Lang::JAVASCRIPT == $lang) {
+			// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#reserved_words
+			// Reserved words, Future reserved words, Future reserved words in older standards
+			$keywords[$lang] .=
+			'abstract|await|boolean|break|byte|case|catch|char|class|const|continue|debugger|default|delete|do|double'
+			.'|else|enum|export|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof'
+			.'|int|interface|let|long|native|new|null|package|private|protected|public|return|short|static|super|switch'
+			.'|synchronized|this|throw|throws|transient|true|try|typeof|var|void|volatile|while|with|yield'
+			;
+		}
+		else if (Lang::PHP == $lang) {
+			// https://www.php.net/manual/en/reserved.keywords.php
+			// https://www.php.net/manual/en/reserved.other-reserved-words.php
+			$keywords[$lang] .=
+			'__CLASS__|__DIR__|__FILE__|__FUNCTION__|__halt_compiler|__LINE__|__METHOD__|__NAMESPACE__|__PROPERTY__'
+			.'|abstract|and|array|as|bool|break|callable|case|catch|class|clone|const|continue|declare|default|die|do'
+			.'|echo|else|elseif|empty|enddeclare|endfor|endforeach|endif|endswitch|endwhile|enum|eval|exit|extends|false'
+			.'|final|finally|float|fn|for|foreach|function|global|goto|if|implements|include|include_once|instanceof'
+			.'|insteadof|int|interface|isset|iterable|list|match|mixed|namespace|never|new|null|numeric|object|or|print'
+			.'|private|protected|public|readonly|require|require_once|resource|return|static|string|switch|throw|trait'
+			.'|true|try|unset|use|var|void|while|xor|yield'
+			;
 		}
 		$keywords[$lang] .= ')$/';
 	}
@@ -186,6 +223,12 @@ function Code_HTML($text, $langStr) {
 		$lang = Lang::CPP;
 	else if ($langStr == 'delphi' || $langStr == 'pas')
 		$lang = Lang::PAS;
+	else if ($langStr == 'cs' || $langStr == 'csharp'|| $langStr == 'c#'|| $langStr == 'sharp')
+		$lang = Lang::CSHARP;
+	else if ($langStr == 'js' || $langStr == 'jscript'|| $langStr == 'javascript')
+		$lang = Lang::JAVASCRIPT;
+	else if ($langStr == 'php')
+		$lang = Lang::PHP;
 
 	$text = trim($text, "\n");
 	$len = strlen($text);
