@@ -7,6 +7,7 @@ abstract class Lang {
 	const CSHARP = 2;
 	const JAVASCRIPT = 3;
 	const PHP  = 4;
+	const PYTHON  = 5;
 };
 
 abstract class State {
@@ -62,6 +63,10 @@ function Code_IsKeyword($lang, $word) {
 			.'|private|protected|public|readonly|require|require_once|resource|return|static|string|switch|throw|trait'
 			.'|true|try|unset|use|var|void|while|xor|yield';
 		}
+		else if (Lang::PYTHON == $lang) {
+			$keywords[$lang] .=
+			'False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|self|try|while|with|yield';
+		}
 		$keywords[$lang] .= ')$/';
 	}
 	return preg_match($keywords[$lang], $word);
@@ -83,7 +88,7 @@ function Code_Parse(&$text, $lang) {
 		$s1 = $i+1 < $len ? $text[$i+1] : '';
 
 		if (State::NONE == $state) {
-			if (TData::NONE == $dataType && (Util_IsLetter($s) || $s=='#' || $s=='_')) {
+			if (TData::NONE == $dataType && (Util_IsLetter($s) || ($s=='#' && Lang::CPP == $lang) || $s=='_')) {
 				$dataType = TData::WORD;
 			}
 			else if (TData::NONE == $dataType && Util_IsDigit($s)) {
@@ -120,7 +125,8 @@ function Code_Parse(&$text, $lang) {
 				}
 			}
 
-			if ($s=='/' && $s1=='/') {
+			if ($s=='/' && $s1=='/' ||
+				Lang::PYTHON == $lang && $s=='#') {
 				$ret.='<span class="comment">';
 				$state = State::LINE_COMMENT;
 			}
@@ -220,6 +226,8 @@ function Code_HTML($text, $langStr) {
 		$lang = Lang::JAVASCRIPT;
 	else if ($langStr == 'php')
 		$lang = Lang::PHP;
+	else if ($langStr == 'py' || $langStr == 'python')
+		$lang = Lang::PYTHON;
 
 	$text = trim($text, "\n");
 	$len = strlen($text);
